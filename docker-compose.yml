@@ -1,0 +1,31 @@
+name: presupuesto-local
+
+services:
+  backend:
+    build: ../presupuesto/BackendPresu
+    container_name: presupuesto-backend-local
+    restart: unless-stopped
+    ports:
+      - "5000:5000"
+    environment:
+      - AppSettings__Secret=prueba_jwt_tokensSFF52315_SDFE12
+      - ASPNETCORE_URLS=http://+:5000
+    working_dir: /app
+    entrypoint: ["dotnet", "WebApi.dll"]
+    networks:
+      - operaciones-nuevo_default # <-- Red de Operaciones
+
+  frontend:
+    build: ../presupuesto/FrontPresupuestos
+    container_name: presupuesto-frontend-local
+    restart: unless-stopped
+    ports:
+      - "9092:80"
+    depends_on:
+      - backend
+    networks:
+      - operaciones-nuevo_default # <-- Misma red para que Nginx vea al backend
+
+networks:
+  operaciones-nuevo_default:
+    external: true

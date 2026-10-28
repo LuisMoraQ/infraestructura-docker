@@ -1,0 +1,43 @@
+name: operaciones-nuevo
+
+services:
+  db:
+    image: mysql:5.5
+    container_name: operaciones-nuevo-db
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: "R00t_S3cr3t0_Muy_Dificil!"
+      MYSQL_DATABASE: db_operaciones
+    ports:
+      - "3307:3306"
+    volumes:
+      - ./data:/var/lib/mysql
+      #- ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+  backend:
+    build: ../operaciones/Backend-operaciones
+    container_name: operaciones-nuevo-backend
+    restart: always
+    ports:
+      - "26289:5000"
+    depends_on:
+      - db
+    environment:
+      - AppSettings__Secret=prueba_jwt_tokensSFF52315_SDFE12
+    volumes:
+      # Mapeo de carpetas para que los archivos persistan en tu disco duro
+      - ../operaciones/Backend-operaciones/Imagenes:/app/Imagenes
+      - ../operaciones/Backend-operaciones/PDF:/app/PDF
+      - ../operaciones/Backend-operaciones/ProyectoTemp:/app/ProyectoTemp
+      - ../operaciones/Backend-operaciones/Textos:/app/Textos
+      - ../operaciones/Backend-operaciones/OtrosTemp:/app/OtrosTemp
+      - ../operaciones/Backend-operaciones/runtimes:/app/runtimes
+
+  frontend:
+    build: ../operaciones/FrontOpera
+    container_name: operaciones-nuevo-frontend
+    restart: always
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
